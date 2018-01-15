@@ -32,7 +32,32 @@ class _Color:
 
 class Glyph:
     """This class contains all glyphs that can be added to the status bar by
-    default."""
+    default.
+    
+    Attributes:
+        NIGHT_MODE
+        AIRPLANE_MODE
+        CELLULAR_BARS
+        TEXT
+        WIFI_BARS
+        TIME_RIGHT
+        BATTERY_PERCENT
+        BLUETOOTH_BATTERY
+        PHONE
+        CLOCK
+        SLANTED_PLUS
+        LOCATION
+        ROTATION_LOCK
+        AIRPLAY
+        MICROPHONE
+        DESK
+        VPN
+        HANGUP
+        ACTIVITY_SPINNER
+        LOCK
+        WATER_INDICATOR
+        BLUETOOTH_HEADPHONES
+    """
     # Im probably missing a few (some useless ones are removed,
     # mostly everything past 33).
     NIGHT_MODE = 1
@@ -148,7 +173,7 @@ class StatusBar:
     
     @property
     def background_color(self):
-        """The background color of the status bar. None is clear.
+        """The background color of the status bar. None is default.
         
         Should be a `Color` object.
         """
@@ -200,6 +225,19 @@ class StatusBar:
         """A set of glyphs that are currently displayed on the status bar.
         
         This is directly responsible for adding and remove items.
+        
+        Examples:
+            To add and remove the airplane mode glyph to the status bar:
+            >>> sb = StatusBar()
+            >>> sb.glyphs.add(Glyph.AIRPLANE_MODE)
+            >>> # Then to remove it:
+            >>> sb.glyphs.remove(Glyph.AIRPLANE_MODE)
+            
+            The `clear` method can also be used to remove all glyphs:
+            >>> sb = StatusBar()
+            >>> sb.glyphs.add(Glyph.AIRPLANE_MODE)
+            >>> sb.glyphs.add(Glyph.NIGHT_MODE)
+            >>> sb.glyphs.clear()  #Remove both glyphs.
         """
         return self._active_glyphs
     
