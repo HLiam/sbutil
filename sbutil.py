@@ -2,11 +2,11 @@ import time
 import objc_util
 from functools import wraps
 from threading import Thread
-import doctest
+
 
 _app = objc_util.ObjCClass('UIApplication').sharedApplication()
 _status_bar = _app.statusBar()
-_color = objc_util.ObjCClass('UICachedDeviceRGBColor')
+_color = objc_util.ObjCClass('UIColor')
 
 
 def _run_in_background(func):
@@ -18,7 +18,7 @@ def _run_in_background(func):
 
 
 class _Color:
-    """Intantiates RGB (0-1) colors. All colors use this."""
+    """Intantiates RGB (0-1) colors. All colors implicitly use this."""
     def __new__(cls, c):
         if c is None:
             return None
@@ -26,8 +26,8 @@ class _Color:
             if len(c) == 3:
                 c += (1,)
             r, g, b, a = c
-            r, g, b = r*255, g*255, b*255
-        return _color.colorWithRed_green_blue_alpha_(r, g, b, a)
+            r, g, b = [int(i * 255) for i in (r, g, b)]
+        return _color.color(red=r, green=g, blue=b, alpha=a)
 
 
 class Glyph:
@@ -70,7 +70,7 @@ class Glyph:
     BLUETOOTH_BATTERY = 11
     PHONE = 13
     CLOCK = 14
-    SLANTED_PLUS = 15  # ?
+    PLUS = 15  # ?
     LOCATION = 17
     ROTATION_LOCK = 18
     AIRPLAY = 20
@@ -144,7 +144,7 @@ class StatusBar:
     @property
     def alpha(self):
         """The status bar's alpha."""
-        _status_bar.alpha()
+        return _status_bar.alpha()
     
     @alpha.setter
     def alpha(self, value):
@@ -190,11 +190,13 @@ class StatusBar:
         
         `None` remove the style.
         """
-        return _status_bar.styleOverrides()
+        style_map = {1: 'success', 2: 'error', 0: None}
+        return style_map[_status_bar.styleOverrides()]
     
     @style.setter
     def style(self, style):
-        _app.removeStatusBarStyleOverrides_(self.style)
+        style_map = {'success': 1, 'error': 2, None: 0}
+        _app.removeStatusBarStyleOverrides_(style_map[self.style])
         if style is None:
             return
         if style == 'success':
@@ -203,22 +205,8 @@ class StatusBar:
             style = 2
         else:
             raise ValueError(f"style must be 'success' or 'error', not {repr(style)}")
+        print(style)
         _app.addStatusBarStyleOverrides_(style)
-    
-    @_run_in_background
-    def flash_style(self, style, duration=1.5):
-        """Flash the status bar as a style for set duration.
-        
-        Args:
-            style(str): The color to flash. Can be one of 'success' or 'error'.
-            duration(int, float): The duration (in seconds) to flash the color
-            for.
-        """
-        try:
-            self.style = style
-            time.sleep(duration)
-        finally:
-            self.style = None
     
     @property
     def glyphs(self):
@@ -265,3 +253,22 @@ class StatusBar:
                 animation will take in seconds. Defaults to 0.
         """
         _status_bar.setHidden_animated_(True, fade_duration)
+    
+    @_run_in_background
+    def flash_style(self, style, duration=1.5):
+        """Flash the status bar as a style for set duration.
+        
+        Args:
+            style(str): The color to flash. Can be one of 'success' or 'error'.
+            duration(int, float): The duration (in seconds) to flash the color
+            for.
+        """
+        try:
+            self.style = style
+            time.sleep(duration)
+        finally:
+            self.style = None
+
+
+if __name__ == '__main__':
+    sb = StatusBar()
