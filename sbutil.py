@@ -85,10 +85,14 @@ class Glyph:
 
 
 class _GlyphSet:
+    """Glyph manager. Can be used as a context manager by calling it."""
     def __init__(self, _items=None):
+        self._context_glyphs = []
         if _items is None:
             _items = {}
         self._items = set(_items)
+        for glyph in self._items:
+            self.add(glyph)
     
     def __repr__(self):
         return f'_GlyphList(_items={repr(self._items)})'
@@ -102,6 +106,20 @@ class _GlyphSet:
     
     def __iter__(self):
         return iter(self._items)
+    
+    def __call__(self, *args):
+        """For use as as a context manager."""
+        self._context_glyphs.append(args)
+        return self
+    
+    def __enter__(self):
+        for glyph in self._context_glyphs[-1]:
+            self.add(glyph)
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        for glyph in self._context_glyphs[-1]:
+            self.remove(glyph)
+        del self._context_glyphs[-1]
     
     def _add_glyph(self, glyph):
         _app.addStatusBarItem_(glyph)
@@ -152,7 +170,7 @@ class StatusBar:
     
     @property
     def width(self):
-        return _status_bar.currentHeight()
+        return _status_bar.currentWidth()
     
     @property
     def height(self):
@@ -188,7 +206,7 @@ class StatusBar:
         """The style of the status bar. Can be one of 'success' (green) or
         'error' (red).
         
-        `None` remove the style.
+        `None` removes the style.
         """
         style_map = {1: 'success', 2: 'error', 0: None}
         return style_map[_status_bar.styleOverrides()]
@@ -212,7 +230,9 @@ class StatusBar:
     def glyphs(self):
         """A set of glyphs that are currently displayed on the status bar.
 
-        This is directly responsible for adding and remove items.
+        This is directly responsible for adding and remove items. This can
+        also be called to use it as a context manager, by passing the glyphs
+        to be displayed for the duration of the context manager.
 
         Examples:
             To add and remove the airplane mode glyph to the status bar:
@@ -229,11 +249,18 @@ class StatusBar:
             >>> sb.glyphs.add(Glyph.NIGHT_MODE)
             >>> sb.glyphs.clear()  # Remove both glyphs
             
+            To use it as a context manager:
+            >>> sb = StatusBar()
+            >>> with sb.glyphs(Glyph.AIRPLANE_MODE, Glyph.NIGHT_MODE):
+            ...     # do something with the airplane mode and night mode glyphs shown
+            ...     pass  
+        
         """
         return self._active_glyphs
     
     @glyphs.setter
     def glyphs(self, other):
+        self._active_glyphs.clear()
         self._active_glyphs = _GlyphSet(other)
     
     def show(self, fade_duration=0):
