@@ -17,19 +17,6 @@ def _run_in_background(func):
     return wrapped
 
 
-class _Color:
-    """Intantiates RGB (0-1) colors. All colors implicitly use this."""
-    def __new__(cls, c):
-        if c is None:
-            return None
-        else:
-            if len(c) == 3:
-                c += (1,)
-            r, g, b, a = c
-            r, g, b = [int(i * 255) for i in (r, g, b)]
-        return _color.color(red=r, green=g, blue=b, alpha=a)
-
-
 class Glyph:
     """This class contains all glyphs that can be added to the status bar by
     default.
@@ -187,7 +174,7 @@ class StatusBar:
     
     @foreground_color.setter
     def foreground_color(self, color):
-        _status_bar.setForegroundColor_(_Color(color))
+        _status_bar.setForegroundColor_(create_color(color))
     
     @property
     def background_color(self):
@@ -199,7 +186,7 @@ class StatusBar:
     
     @background_color.setter
     def background_color(self, color):
-        _status_bar.setBackgroundColor_(_Color(color))
+        _status_bar.setBackgroundColor_(create_color(color))
     
     @property
     def style(self):
@@ -231,7 +218,7 @@ class StatusBar:
         """A set of glyphs that are currently displayed on the status bar.
 
         This is directly responsible for adding and remove items. This can
-        also be called to use it as a context manager, by passing the glyphs
+        also be called to use it as a context manager by passing the glyphs
         to be displayed for the duration of the context manager.
 
         Examples:
@@ -295,6 +282,15 @@ class StatusBar:
             time.sleep(duration)
         finally:
             self.style = None
+
+
+def create_color(c):
+    if c is None:
+        return None
+    else:
+        if len(c) == 3:
+            c += (1,)
+    return _color.akColorWithSRGBRed_green_blue_alpha_(*c)
 
 
 if __name__ == '__main__':
