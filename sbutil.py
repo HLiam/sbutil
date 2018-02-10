@@ -210,7 +210,6 @@ class StatusBar:
             style = 2
         else:
             raise ValueError(f"style must be 'success' or 'error', not {repr(style)}")
-        print(style)
         _app.addStatusBarStyleOverrides_(style)
     
     @property
