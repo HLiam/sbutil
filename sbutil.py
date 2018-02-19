@@ -244,7 +244,7 @@ class StatusBar:
             >>> sb = StatusBar()
             >>> with sb.glyphs(Glyph.AIRPLANE_MODE, Glyph.NIGHT_MODE):
             ...     # do something with the airplane mode and night mode glyphs shown
-            ...     pass  
+            ...     pass
         
         """
         return self._active_glyphs
