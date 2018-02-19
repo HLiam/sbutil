@@ -18,8 +18,8 @@ def _run_in_background(func):
 
 
 class Glyph:
-    """This class contains all glyphs that can be added to the status bar by
-    default.
+    """This class contains all glyphs that can be added to the status
+    bar by default.
     
     Attributes:
         NIGHT_MODE
@@ -44,9 +44,13 @@ class Glyph:
         LOCK
         WATER_INDICATOR
         BLUETOOTH_HEADPHONES
+    
+    Notes:
+        The `LOCK` glyph shows the unlocking animation when removed.
+        Some glyphs create obscure shapes, are glitchy, or remove
+            numbers from the clock when added. These haven't been
+            included, but you're really not missing out.
     """
-    # Im probably missing a few (some useless ones are removed,
-    # mostly everything past 33).
     NIGHT_MODE = 1
     AIRPLANE_MODE = 2
     CELLULAR_BARS = 3
@@ -57,14 +61,14 @@ class Glyph:
     BLUETOOTH_BATTERY = 11
     PHONE = 13
     CLOCK = 14
-    PLUS = 15  # ?
+    PLUS = 15
     LOCATION = 17
     ROTATION_LOCK = 18
     AIRPLAY = 20
     MICROPHONE = 21
     DESK = 23
     VPN = 24
-    HANGUP = 25  # ?
+    HANGUP = 25
     ACTIVITY_SPINNER = 26
     LOCK = 31  # shows animation when removed.
     WATER_INDICATOR = 32
@@ -73,6 +77,7 @@ class Glyph:
 
 class _GlyphSet:
     """Glyph manager. Can be used as a context manager by calling it."""
+    
     def __init__(self, _items=None):
         self._context_glyphs = []
         if _items is None:
