@@ -162,6 +162,7 @@ class StatusBar:
     
     @property
     def width(self):
+        """The status bar's width."""
         return _status_bar.currentWidth()
     
     @property
@@ -171,7 +172,7 @@ class StatusBar:
     
     @property
     def foreground_color(self):
-        """The foreground color of the status bar. None is defaul.
+        """The foreground color of the status bar. None is default.
         
         Should be a `Color` object.
         """
